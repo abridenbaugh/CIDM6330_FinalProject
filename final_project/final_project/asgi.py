@@ -9,8 +9,25 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 
 import os
 
+from channels.routing import ChannelNameRouter, ProtocolTypeRouter
 from django.core.asgi import get_asgi_application
+
+from django.core.asgi import get_asgi_application
+
+from succession_plans import consumers
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "final_project.settings")
 
-application = get_asgi_application()
+final_project_asgi_app = get_asgi_application()
+
+application = ProtocolTypeRouter(
+    {
+        "http": final_project_asgi_app, 
+        "channel": ChannelNameRouter(
+            {
+                "succession_plan_needed": consumers.SuccessionPlanConsumer.as_asgi(),
+            }
+        )
+    }
+)
+
